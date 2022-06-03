@@ -20,4 +20,3 @@ jobs:
       - name: Install dependencies & run tests
         run: |
           npm ci
-          npm start
