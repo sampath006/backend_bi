@@ -10,7 +10,7 @@ info:
 
 
 servers: 
-    -   url : http://localhost:5000
+    -   url : https://shielded-river-38580.herokuapp.com/
         description: "main server"
 
 tags:
