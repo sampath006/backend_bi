@@ -1,0 +1,515 @@
+openapi : 3.0.0
+
+info:
+    title: 'BlogsPage API'
+    version: '1.0'
+    description: 'This is the documentation for the project'
+    contact: 
+        name: Group 27
+        email: sampthkumarreddy.m19@iiits.in
+
+
+servers: 
+    -   url : http://localhost:5000
+        description: "main server"
+
+tags:
+  - name: Post
+    description: API to manage blogs posts
+  - name: User
+    description: API to manage blogs USER Details
+  - name: Event
+    description: API to manage Event Details
+  - name: Category
+    description: API to manage existing cateogeries
+
+
+
+# 2) Apply the security globally to all operations
+security:
+  - bearerAuth: []         # use the same name as above
+
+
+
+paths:
+    /api/posts:
+        get: 
+            summary: "gives all the information about the posts"
+            tags: [Post]
+            responses:
+                '200':
+                    description: 'Fetching all the posts is succesfull'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Post'
+        post:
+            summary: "creates a post"
+            tags: [Post]
+            requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Post'
+            responses:
+              '200':
+                description: "Posting the blog is succesfull"
+              '500':
+                description: "Cannot repost again try with other title"
+
+    /api/posts?title:
+        get:
+            summary: "Get posts by title"
+            tags: [Post]
+            parameters:
+              - in: query
+                name: title
+                required: true
+                description: "The title of a blog"
+                schema: 
+                    type: string
+            responses:
+                '200':
+                    description: 'Fetching all the posts is succesfull'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Post'
+    /api/posts?cat:
+        get:
+            summary: "Get posts by Category"
+            tags: [Post]
+            parameters:
+              - in: query
+                name: cat
+                required: true
+                description: "The categories of a blog"
+                schema: 
+                    type: string
+            responses:
+                '200':
+                    description: 'Fetching all the posts based on categories is succesfull'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Post'
+        
+    /api/posts?user:
+        get:
+            summary: "Get posts written by specific user"
+            tags: [Post]
+            parameters:
+              - in: query
+                name: user
+                required: true
+                description: "The username of a blog"
+                schema: 
+                    type: string
+            responses:
+                '200':
+                    description: 'Fetching all the posts of a user is succesfull'
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Post'
+    /api/posts/{post_id}:
+        get:
+            summary: "Get a single post data"
+            tags: [Post]
+            parameters:
+              - in: path
+                name: post_id
+                required: true
+                description: "auto-generated Post ID by Mongodb"
+                schema: 
+                    type: string
+            responses:
+              '200' :
+                description: "Single post Displayed successfully"
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Post'
+
+
+    /api/posts/sp/{post_id}:
+        delete:
+            summary: Deletes a Post 
+            tags: [Post]
+            parameters:
+              - name: post_id
+                in: path
+                required: true
+                description: auto-generated Post ID by Mongodb
+                schema: 
+                    type: string
+            body:
+              - name: username
+                in: header
+                required: true
+                description: The username of the post
+                schema: 
+                    type: string
+            responses:
+              '200' :
+                description: "Deleted Successfully"
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Post'  
+              '401':
+                description: "You are not loggedin with same account"
+        put:
+          summary: 'Updates the post'
+          tags: [Post]
+          parameters :
+            - in : path
+              name: post_id
+              required: true
+              schema:
+                type: string
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/Post'
+          responses: 
+            '200': 
+                description: 'Post Details Updated Successfully'
+
+    /api/users/:
+        get: 
+            summary: "gives all the information about the users"
+            tags: [User]
+            responses:
+                '200':
+                    description: 'Fetching all the posts is succesfull'
+                    content:
+                        application/json:
+                          schema:
+                            $ref: '#/components/schemas/User'
+    /api/users/{user_id}:
+        get:
+            summary: "Get a single user data"
+            tags: [User]
+            parameters:
+              - in: path
+                name: user_id
+                required: true
+                schema: 
+                    type: string
+            responses:
+              '200' :
+                description: "Single post Displayed successfully"
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/User'
+        put:
+            summary: 'Edit details of the user'
+            tags: [User]
+            parameters:
+              - in : path
+                name: user_id
+                required: true
+                schema:
+                    type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/User'
+            responses:
+                '200':
+                    description: 'Success fully edited the details'
+        delete:
+            summary: Deletes a User 
+            tags: [User]
+            parameters:
+              - name: user_id
+                in: path
+                required: true
+                description: auto-generated User ID by Mongodb
+                schema: 
+                    type: string
+            responses:
+              '200' :
+                description: "Deleted Successfully"
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/User'  
+              '401':
+                description: "You are not loggedin with same account"
+
+    /api/auth/login:
+      post:
+        summary: "Login with acc credentials"
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref : "#/components/schemas/User"
+        tags: [User]
+        responses:
+          '200' :
+            description: "JWT TOKEN CREATED"
+            content:
+              application/json:
+                schema:
+                    $ref: '#/components/schemas/User'
+          '400' :
+            description: "Invalid credentials"
+
+    /api/auth/register:
+      post:
+        summary: "Regiter as a new account"
+        tags: [User]
+        requestBody:
+          required: true
+          content:
+            application/json:
+              name: username
+              schema:
+                type: string
+              
+              name: email
+              schema:
+                type: string
+              name: password
+              schema:
+                type: password
+    
+        responses:
+          '200' :
+            description: "Single post Displayed successfully"
+            content:
+              application/json:
+                schema:
+                    $ref: '#/components/schemas/User'
+    
+    
+    /api/events:
+        get:
+            summary: 'Retrive all the events'
+            tags: [Event]
+            responses:
+                '200':
+                    description: 'Fetching all the events is succesfull'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Event'
+        post:
+            summary: "creates a Event"
+            tags: [Event]
+            requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Event'
+            responses:
+              '200':
+                description: "Posting the blog is succesfull"
+              '500':
+                description: "Cannot repost again try with other title"
+
+    /api/events/{event_id}:
+        get:
+            summary: "Get a single Event data"
+            tags: [Event]
+            parameters:
+              - in: path
+                name: event_id
+                required: true
+                description: "auto-generated Post ID by Mongodb"
+                schema: 
+                    type: string
+            responses:
+              '200' :
+                description: "Single Event Displayed successfully"
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Event'
+    /api/events/sp/{event_id}:
+        put:
+          summary: 'Updates the Event Details'
+          tags: [Event]
+          parameters :
+            - in : path
+              name: event_id
+              required: true
+              schema:
+                type: string
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/Event'
+          responses: 
+            '200': 
+                description: 'Event Details Updated Successfully'
+        delete:
+            summary: Deletes a Event 
+            tags: [Event]
+            parameters:
+              - name: event_id
+                in: path
+                required: true
+                description: auto-generated Event ID by Mongodb
+                schema: 
+                    type: string
+            responses:
+              '200' :
+                description: "Deleted Successfully"
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Event'  
+              '401':
+                description: "You are not loggedin with same account"
+     
+# write put and delete here
+    /api/categories:
+        get: 
+            summary: "gives all the information about the Cateogery"
+            tags: [Category]
+            responses:
+                '200':
+                    description: 'Fetching all the Categories is succesfull'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Category'
+        post:
+            summary: "creates a new Category"
+            tags: [Category]
+            requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                        $ref: '#/components/schemas/Category:'
+            responses:
+              '200':
+                description: "Posting the Category is succesfull"
+              '500':
+                description: "Cannot add same Category again try with other Category"
+
+                       
+
+
+components:
+    schemas:
+        Post:
+            type: object
+            required: 
+                - title
+                - desc
+                - username
+            properties:
+                _id :
+                    type: string
+                title:
+                    type: string
+                desc:
+                    type: string
+                photo:
+                    type: string
+                username: 
+                    type: string
+                categories:
+                    type: array
+                    items:
+                        type: string
+                createdAt:
+                    type: string
+            example:
+                title: Abdul Kalam
+                desc: Abdul Kalam is the first prime minister of the India.
+                username: deepak
+        User:
+            type: object
+            required:
+                - username
+                - email
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                password:
+                    type: string
+            example:
+                username: "sampath"
+                email: sampthkumarreddy.m19@iiits.in
+        Event:
+            type: Object
+            required:
+                - title
+                - date
+                - venue
+            properties: 
+                title:
+                    type: string
+                date:
+                    type: date
+                photo:
+                    type: string
+                desc: 
+                    type: string
+                prize:
+                    type: string
+                username:
+                    type: string
+                categories:
+                    type: array
+                    items: 
+                        type: string
+                venue:
+                    type: string
+            example:
+                title: Abdul Kalam
+                desc: Abdul Kalam is the first prime minister of the India.
+                username: deepak
+                venue: Hyderabad
+        Category:
+            type: Object
+            required:
+                - name
+            properties: 
+                name:
+                    type: string
+            example:
+                name: News
+
+    securitySchemes:
+      bearerAuth:            # arbitrary name for the security scheme
+        type: http
+        scheme: bearer
+        bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+
+        # securitySchemes:
+        #     app_id:
+        #     type: apiKey
+        #     description: API key to authorize requests.
+        #     name: appid
+        #     in: query
+
+                
+
+            
+

@@ -1,7 +1,6 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const User = require('./User');
 const Category = require('./Category')
-
 //This is Events schema for backend.
 //Here we defined the data types for the backend.
 

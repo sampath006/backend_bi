@@ -5,6 +5,15 @@ const mongoose = require('mongoose');
 const dotenv = require("dotenv");
 
 
+const swaggerUi = require('swagger-ui-express')
+const YAML = require('yamljs'); 
+const swaggerDocument = YAML.load('./swagger/swagger.yaml');
+const postRoute = require("./routes/posts");
+const categoryRoute = require("./routes/categories");
+const eventRoute = require("./routes/Events")
+const commentRoute = require("./routes/Comment")
+
+
 //getting routes
 
 const adminRoute = require("./routes/admin")
@@ -26,11 +35,24 @@ app.use(express.json())
 
 // declaring routes
 app.use("/api/admin",adminRoute);
-app.use("/api/auth",authRoute);
-app.use("/api/user",userRoute);
 
-app.listen("5000",()=>{
-  console.log("Backend is running ...");
+app.use("/api/auth",authRoute);
+app.use("/api/users",userRoute);
+app.use("/api/posts",postRoute);
+app.use("/api/categories",categoryRoute);
+app.use("/api/events",eventRoute);
+app.use("/api/comments",commentRoute);
+const port = 5000;
+
+app.listen(process.env.PORT || port,()=>{
+  console.log(`Backend is running ...${port}`);
 });
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument)
+)
+
 
 module.exports = app;

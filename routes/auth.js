@@ -73,6 +73,7 @@ router.post("/token",async (req,res)=>{
 
 router.post("/login", async (req,res)=>{
     try{
+        console.log(req.body.username)
         var user = await User.findOne({username:req.body.username})
         // return res.status(200).json(user)
         //!user && res.status(400).json("Wrong Credentials!!!"))
@@ -145,24 +146,33 @@ router.post("/Adminregister",async (req,res)=>{
 
 //Admin Login
 
+
+
+
 router.post("/Adminlogin", async (req,res)=>{
+
+
     try{
-        const user = await Admin.findOne({username:req.body.username})
-        //!user && res.status(400).json("Wrong Credentials!!!"))
+        var user = await Admin.findOne({username:req.body.username})
         if (!user){
-            return res.status(400).json("Not Admin!!!")
+            return res.status(400).json("Wrong Credentials !!!")
         }
         const validate = await bcrypt.compare(req.body.password,user.password)
-        // !validate && res.status(400).json("Wrong Credentials!!!")
         if (!validate){
-            return res.status(400).json("Not Admin!!!")
+            return res.status(400).json("Wrong Credentials!!!")
         }
-        const {password, ...others} = user._doc;
-        res.status(200).json(others);
-        // return
+        const userm=user
+        user={name: user.username,_id:user._id}
+        const accessToken = generateAuthenticationToken(user)
+        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET)
+        refreshTokens.push(refreshToken)
+        const data = {accessToken: accessToken,refreshToken: refreshToken,_id:userm._id,username:userm.username,profilePic:userm.profilePic,email: userm.email}
+        return res.status(200).json(data)
     } catch(err){
+        console.log(err)
         res.status(500).json(err);
     }
+
 });
 
 // module.exports = {router,authenticateToken}
