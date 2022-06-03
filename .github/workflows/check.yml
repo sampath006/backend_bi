@@ -2,7 +2,8 @@ name : Devops
 
 on: push
 
-jobs: test:
+jobs: 
+  test:
     name: testing code
     runs-on: ubuntu-latest
 
